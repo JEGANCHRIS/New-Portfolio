@@ -1,0 +1,111 @@
+.night-sky-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.theme-night .night-sky-container {
+  z-index: 0;
+}
+
+.night-sky-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.night-sky-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at bottom,
+    rgba(15, 12, 41, 0.3) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* CSS Twinkling Stars for additional effect */
+.twinkling-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--twinkle-duration) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.4),
+    0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Shooting star animation */
+.shooting-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.4);
+  animation: shooting-star-fall 3s linear infinite;
+  opacity: 0;
+}
+
+.shooting-star::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, white, transparent);
+  transform: translateX(100%);
+}
+
+@keyframes shooting-star-fall {
+  0% {
+    transform: translate(0, 0) rotate(45deg);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(300px, 300px) rotate(45deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(300px, 300px) rotate(45deg);
+    opacity: 0;
+  }
+}

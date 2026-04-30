@@ -1,0 +1,516 @@
+/* Snow Mode - Night Snow Mountain Theme - Enhanced Visibility */
+
+/* Base Snow Mode - Much Darker Background */
+.theme-snow {
+  background: #020617;
+}
+
+.theme-snow body {
+  background: #020617;
+}
+
+/* Hero Section - Darker for Visible Snowfall */
+.theme-snow .hero-section-advanced {
+  background: linear-gradient(
+    135deg,
+    rgba(2, 6, 23, 0.98) 0%,
+    rgba(15, 23, 42, 0.95) 40%,
+    rgba(30, 58, 95, 0.9) 70%,
+    rgba(49, 46, 129, 0.85) 100%
+  );
+  position: relative;
+}
+
+.theme-snow .hero-section-advanced::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0%,
+    rgba(2, 6, 23, 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+/* Navbar */
+.theme-snow .navbar {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 30px rgba(99, 102, 241, 0.2);
+}
+
+.theme-snow .nav-logo {
+  color: #f1f5f9;
+}
+
+.theme-snow .logo-badge {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .nav-menu a {
+  color: #cbd5e1;
+}
+
+.theme-snow .nav-menu a:hover {
+  color: #6366f1;
+}
+
+.theme-snow .nav-logout {
+  border: 1px solid #6366f1;
+  color: #6366f1;
+}
+
+.theme-snow .nav-logout:hover {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Theme Toggle */
+.theme-snow .theme-toggle-modern {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+.theme-snow .theme-toggle-label {
+  color: rgba(99, 102, 241, 0.9);
+}
+
+.theme-snow .theme-btn-modern {
+  color: #cbd5e1;
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.theme-snow .theme-btn-modern:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .theme-btn-modern.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .theme-toggle-indicator {
+  background: linear-gradient(90deg, transparent, #6366f1, transparent);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+/* Hero Section - Enhanced Aurora Gradient */
+.theme-snow .hero-section-advanced {
+  background: linear-gradient(
+    135deg,
+    rgba(2, 6, 23, 0.98) 0%,
+    rgba(15, 23, 42, 0.92) 30%,
+    rgba(30, 41, 59, 0.88) 50%,
+    rgba(49, 46, 129, 0.82) 70%,
+    rgba(79, 70, 229, 0.75) 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-snow .hero-section-advanced::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(
+      circle at 70% 30%,
+      rgba(99, 102, 241, 0.2) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 30% 70%,
+      rgba(139, 92, 246, 0.15) 0%,
+      transparent 50%
+    );
+  animation: auroraMove 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes auroraMove {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-10%, 10%) scale(1.1);
+  }
+}
+
+.theme-snow .hero-section-advanced::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: linear-gradient(to top, rgba(2, 6, 23, 0.8), transparent);
+  pointer-events: none;
+}
+
+.theme-snow .hero-name-advanced {
+  background: linear-gradient(135deg, #ffffff, #e0e7ff, #bae6fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.8));
+  font-weight: 800;
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .hero-title-advanced {
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .hero-info-advanced .info-item-advanced {
+  color: #ffffff;
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .resume-btn-advanced {
+  background: linear-gradient(135deg, #ffffff, #e0e7ff);
+  color: ghostwhite !important;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .resume-btn-advanced:hover {
+  background: linear-gradient(135deg, #e0e7ff, #bae6fd);
+  box-shadow: 0 6px 30px rgba(255, 255, 255, 0.6);
+  transform: translateY(-3px) scale(1.02);
+  color: rgb(158, 176, 255) !important;
+}
+
+/* Section Titles */
+.theme-snow .section-title-advanced {
+  background: linear-gradient(135deg, #ffffff, #e0e7ff, #bae6fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.5));
+}
+
+/* Cards - Opaque to Block Snowflakes */
+.theme-snow .about-card-advanced,
+.theme-snow .skill-category-advanced,
+.theme-snow .timeline-item-advanced,
+.theme-snow .project-card-advanced,
+.theme-snow .education-card-advanced,
+.theme-snow .training-card-advanced {
+  background: rgba(30, 41, 59, 0.98);
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .skill-tag-advanced {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.3),
+    rgba(139, 92, 246, 0.3)
+  );
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 10;
+}
+
+/* Contact Form - Opaque */
+.theme-snow .contact-form-advanced {
+  background: rgba(30, 41, 59, 0.98);
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .contact-form-advanced input,
+.theme-snow .contact-form-advanced textarea {
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid rgba(99, 102, 241, 0.5);
+  color: #ffffff;
+  position: relative;
+  z-index: 10;
+}
+
+.theme-snow .contact-form-advanced input:focus,
+.theme-snow .contact-form-advanced textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
+
+.theme-snow .submit-btn-advanced {
+  background: linear-gradient(135deg, #ffffff, #e0e7ff);
+  color: #1e3a5f;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.theme-snow .submit-btn-advanced:hover {
+  background: linear-gradient(135deg, #e0e7ff, #bae6fd);
+  box-shadow: 0 6px 30px rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Admin Dashboard */
+.theme-snow .admin-dashboard {
+  background: #020617;
+}
+
+.theme-snow .dashboard-header {
+  background: rgba(2, 6, 23, 0.95);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .stat-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .dashboard-logout {
+  border: 1px solid #6366f1;
+  color: #ffffff;
+}
+
+.theme-snow .dashboard-logout:hover {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
+}
+
+/* Resume Management */
+.theme-snow .resume-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .upload-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.theme-snow .view-btn {
+  background: rgba(99, 102, 241, 0.15);
+  color: #f1f5f9;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .download-btn {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+}
+
+.theme-snow .delete-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* AI Chat */
+.theme-snow .ai-chat-toggle {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .ai-chat-window {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .ai-chat-header {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.theme-snow .message.assistant .message-text {
+  background: rgba(30, 41, 59, 0.6);
+  color: #f1f5f9;
+}
+
+.theme-snow .message.user .message-text {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.theme-snow .ai-chat-input textarea {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}
+
+.theme-snow .send-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.theme-snow .suggestion-btn {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}
+
+/* Resume Preview */
+.theme-snow .resume-preview-section-advanced {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(30, 58, 95, 0.9) 40%,
+    rgba(79, 70, 229, 0.85) 70%,
+    rgba(139, 92, 246, 0.8) 100%
+  );
+}
+
+.theme-snow .preview-icon {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.5));
+}
+
+.theme-snow .preview-title h2 {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.theme-snow .preview-title h2::after {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .resume-preview-container-large {
+  background: rgba(30, 41, 59, 0.6);
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 25px 80px rgba(99, 102, 241, 0.3),
+    0 0 60px rgba(139, 92, 246, 0.25),
+    inset 0 0 100px rgba(30, 41, 59, 0.3);
+}
+
+.theme-snow .resume-preview-container-large::after {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.5),
+    rgba(139, 92, 246, 0.5),
+    rgba(14, 165, 233, 0.5)
+  );
+}
+
+.theme-snow .resume-preview-container-large:hover {
+  box-shadow:
+    0 35px 100px rgba(99, 102, 241, 0.4),
+    0 0 80px rgba(139, 92, 246, 0.35),
+    inset 0 0 100px rgba(30, 41, 59, 0.4);
+}
+
+.theme-snow .preview-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2),
+    rgba(139, 92, 246, 0.2)
+  );
+  color: #f1f5f9;
+  border: 2px solid rgba(99, 102, 241, 0.4);
+}
+
+.theme-snow .preview-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.3),
+    rgba(139, 92, 246, 0.3)
+  );
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.theme-snow .preview-hint {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(139, 92, 246, 0.15)
+  );
+  color: #cbd5e1;
+  border: 2px solid rgba(99, 102, 241, 0.4);
+}
+
+/* Edit Form */
+.theme-snow .edit-portfolio-container-advanced {
+  background: #0f172a;
+}
+
+.theme-snow .edit-tab-advanced {
+  background: rgba(99, 102, 241, 0.15);
+  color: #f1f5f9;
+}
+
+.theme-snow .edit-tab-advanced:hover {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+.theme-snow .edit-tab-advanced.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow .skill-category-edit {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .edit-item-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.theme-snow .add-btn,
+.theme-snow .add-item-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.theme-snow .save-btn-advanced {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.theme-snow .cancel-btn-advanced {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}
+
+/* Scrollbars */
+.theme-snow ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.theme-snow ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+/* Selection */
+.theme-snow ::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}

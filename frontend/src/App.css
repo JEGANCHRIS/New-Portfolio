@@ -1,0 +1,412 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Toastify Custom Styles */
+  --toastify-color-success: #48bb78;
+  --toastify-color-error: #f56565;
+  --toastify-color-warning: #ed8936;
+  --toastify-color-info: #4299e1;
+
+  /* Professional Day Mode - Purple to Blue Gradient */
+  --day-primary: #9600ff;
+  --day-primary-dark: #7a00d9;
+  --day-secondary: #aebaf8;
+  --day-accent: #6b4cff;
+  --day-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --day-gradient-alt: linear-gradient(135deg, #f5f0ff 0%, #e8ecff 100%);
+  --day-bg: #faf9ff;
+  --day-bg-alt: #ffffff;
+  --day-card: #ffffff;
+  --day-card-hover: #f8f7ff;
+  --day-text: #1a1a2e;
+  --day-text-secondary: #4a4a68;
+  --day-text-light: #717196;
+  --day-border: #e8e4f0;
+  --day-shadow: rgba(150, 0, 255, 0.1);
+  --day-success: #10b981;
+  --day-warning: #f59e0b;
+  --day-danger: #ef4444;
+
+  /* Professional Night Mode - Deep & Mysterious */
+  --night-primary: #6366f1;
+  --night-primary-dark: #4f46e5;
+  --night-secondary: #a855f7;
+  --night-accent: #14b8a6;
+  --night-gradient: linear-gradient(
+    135deg,
+    #0f0c29 0%,
+    #302b63 50%,
+    #24243e 100%
+  );
+  --night-gradient-alt: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --night-bg: #0a0a0f;
+  --night-bg-alt: #0f0e17;
+  --night-card: #1a1a2e;
+  --night-card-hover: #252542;
+  --night-text: #f7fafc;
+  --night-text-secondary: #a0aec0;
+  --night-text-light: #718096;
+  --night-border: #2d3748;
+  --night-shadow: rgba(99, 102, 241, 0.15);
+  --night-success: #10b981;
+  --night-warning: #f59e0b;
+  --night-danger: #ef4444;
+
+  /* Night Snow Mountain Theme - Majestic Winter Nights */
+  --snow-primary: #6366f1;
+  --snow-primary-dark: #4338ca;
+  --snow-secondary: #8b5cf6;
+  --snow-accent: #0ea5e9;
+  --snow-accent-2: #1e3a5f;
+  --snow-accent-3: #f1f5f9;
+  --snow-gradient: linear-gradient(
+    135deg,
+    #020617 0%,
+    #0f172a 40%,
+    #1e3a5f 70%,
+    #312e81 100%
+  );
+  --snow-gradient-alt: linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
+  --snow-bg: #020617;
+  --snow-bg-alt: #0f172a;
+  --snow-card: #1e293b;
+  --snow-card-hover: #334155;
+  --snow-text: #1a202c;
+  --snow-text-secondary: #4a5568;
+  --snow-text-light: #2d3748;
+  --snow-border: rgba(99, 102, 241, 0.4);
+  --snow-shadow: rgba(99, 102, 241, 0.3);
+  --snow-success: #10b981;
+  --snow-warning: #f59e0b;
+  --snow-danger: #ef4444;
+}
+
+/* Toastify Dark Theme Support */
+
+.Toastify{
+  padding: 0px;
+}
+.theme-night .Toastify__toast,
+.theme-snow .Toastify__toast {
+  background: rgba(26, 26, 46, 0.95);
+  color: #f7fafc;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.theme-night .Toastify__progress-bar,
+.theme-snow .Toastify__progress-bar {
+  background: linear-gradient(90deg, #a78bfa, #8b5cf6);
+}
+
+.theme-night .Toastify__close-button,
+.theme-snow .Toastify__close-button {
+  color: #f7fafc;
+}
+
+/* Toastify Light Theme */
+.theme-day .Toastify__toast {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a202c;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.theme-day .Toastify__progress-bar {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* Confirm Alert Custom Styles */
+.react-confirm-alert-blur {
+  filter: blur(2px);
+}
+
+.react-confirm-alert {
+  z-index: 9999 !important;
+}
+
+.react-confirm-alert-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.react-confirm-alert-body {
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.theme-day .react-confirm-alert-body {
+  background: white;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.theme-night .react-confirm-alert-body,
+.theme-snow .react-confirm-alert-body {
+  background: rgba(26, 26, 46, 0.95);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #f7fafc;
+}
+
+.react-confirm-alert-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.react-confirm-alert-message {
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
+
+.react-confirm-alert-button-group {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.react-confirm-alert-button-group button {
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.react-confirm-alert-button-group button:first-child {
+  background: linear-gradient(135deg, #f56565, #e53e3e);
+  color: white;
+}
+
+.react-confirm-alert-button-group button:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+}
+
+.react-confirm-alert-button-group button:last-child {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.react-confirm-alert-button-group button:last-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.app {
+  min-height: 100vh;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Content BELOW snow mode */
+.app > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Snow mode ABOVE content */
+.snow-mode-container {
+  z-index: 9999 !important;
+}
+
+/* Scroll Progress Bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient, var(--day-gradient));
+  transform-origin: 0%;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Day mode - pastel gradient scroll progress */
+.theme-day .scroll-progress {
+  background: linear-gradient(135deg, #add8e6 0%, #fffacd 50%, #ffb6c1 100%);
+  box-shadow: 0 2px 10px rgba(173, 216, 230, 0.4);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--day-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--day-gradient);
+  border-radius: 10px;
+  border: 2px solid var(--day-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Theme Classes */
+.theme-day {
+  --gradient: var(--day-gradient);
+  background: var(--day-bg);
+  color: var(--day-text);
+}
+
+.theme-day::-webkit-scrollbar-track {
+  background: var(--day-bg);
+}
+
+.theme-day::-webkit-scrollbar-thumb {
+  background: var(--day-gradient);
+}
+
+.theme-night {
+  --gradient: var(--night-gradient);
+  background: var(--night-bg);
+  color: var(--night-text);
+}
+
+.theme-night::-webkit-scrollbar-track {
+  background: var(--night-bg);
+}
+
+.theme-night::-webkit-scrollbar-thumb {
+  background: var(--night-gradient);
+}
+
+.theme-snow {
+  --gradient: var(--snow-gradient);
+  background: var(--snow-bg);
+  color: var(--snow-text);
+  position: relative;
+}
+
+.theme-snow::-webkit-scrollbar-track {
+  background: var(--snow-bg);
+}
+
+.theme-snow::-webkit-scrollbar-thumb {
+  background: var(--snow-gradient);
+}
+
+/* Snow Mode Animations */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(20px) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes snowfall-sway {
+  0%,
+  100% {
+    transform: translateX(-15px);
+  }
+  50% {
+    transform: translateX(15px);
+  }
+}
+
+.snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+  z-index: 1;
+  pointer-events: none;
+  animation:
+    snowfall linear forwards,
+    snowfall-sway ease-in-out infinite;
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #faf9ff 0%, #ffffff 100%);
+}
+
+.theme-night .loading-screen {
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+  color: #f7fafc;
+}
+
+.theme-snow .loading-screen {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+  color: #ffffff;
+}
