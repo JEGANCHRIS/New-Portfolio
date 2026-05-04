@@ -46,7 +46,7 @@ INSTRUCTIONS:
 - Encourage visitors to reach out via email for more details
 - Mention availability for freelance/full-time opportunities when relevant`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const history = conversationHistory.map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
