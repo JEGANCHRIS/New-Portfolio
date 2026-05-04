@@ -1,20 +1,19 @@
 import express from "express";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import Portfolio from "../models/Portfolio.js";
 import CareerInfo from "../models/CareerInfo.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 router.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, conversationHistory = [] } = req.body;
     if (!message) return res.status(400).json({ error: "Message is required" });
 
     const portfolio = await Portfolio.findOne().select("name title email location");
 
-    // Only fetch docs relevant to the message keyword to save tokens
     const kw = message.toLowerCase();
     let category = null;
     if (kw.includes("skill") || kw.includes("tech")) category = "skills";
@@ -28,16 +27,26 @@ router.post("/chat", async (req, res) => {
 
     const context = docs.map((d) => `${d.title}: ${d.content}`).join("\n");
 
-    const prompt = `You are ${portfolio?.name || "Meshach"}'s AI assistant (${portfolio?.title || "Full Stack Developer"}). Speak as Meshach in first person. Be brief and helpful.
+    const systemPrompt = `You are ${portfolio?.name || "Meshach"}'s AI assistant (${portfolio?.title || "Full Stack Developer"}). Speak as Meshach in first person. Be brief and helpful.
 Contact: ${portfolio?.email || "jmchristo.2000@gmail.com"}
-${context ? `Context:\n${context}` : ""}
+${context ? `Context:\n${context}` : ""}`;
 
-User: ${message}`;
+    const history = conversationHistory.map((msg) => ({
+      role: msg.role === "assistant" ? "assistant" : "user",
+      content: msg.content,
+    }));
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...history,
+        { role: "user", content: message },
+      ],
+      max_tokens: 300,
+    });
 
+    const response = completion.choices[0].message.content;
     res.json({ response, sources: [] });
   } catch (error) {
     console.error("AI Chat error:", error.message);
