@@ -11,7 +11,7 @@ const careerInfoSchema = new mongoose.Schema(
     content: { type: String, required: true },
     embedding: {
       type: [Number],
-      index: "2048" // MongoDB Atlas Vector Search index dimension for nomic-embed-text
+      default: [],
     },
     metadata: {
       tags: [String],
@@ -20,8 +20,5 @@ const careerInfoSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Create vector search index (for MongoDB Atlas)
-careerInfoSchema.index({ embedding: "2048" });
 
 export default mongoose.model("CareerInfo", careerInfoSchema);

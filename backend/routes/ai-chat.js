@@ -66,8 +66,8 @@ INSTRUCTIONS:
 
     res.json({ response, sources: [] });
   } catch (error) {
-    console.error("AI Chat error:", error.message);
-    res.status(500).json({ error: "Failed to process chat message" });
+    console.error("AI Chat error:", error.message, error.stack);
+    res.status(500).json({ error: "Failed to process chat message", detail: error.message });
   }
 });
 
