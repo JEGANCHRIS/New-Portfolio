@@ -9,73 +9,46 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.post("/chat", async (req, res) => {
   try {
-    const { message, conversationHistory = [] } = req.body;
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required" });
 
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
-    }
+    const portfolio = await Portfolio.findOne().select("name title email location");
 
-    const portfolio = await Portfolio.findOne();
-    const careerInfoDocs = await CareerInfo.find().select("-embedding").limit(20);
+    // Only fetch docs relevant to the message keyword to save tokens
+    const kw = message.toLowerCase();
+    let category = null;
+    if (kw.includes("skill") || kw.includes("tech")) category = "skills";
+    else if (kw.includes("experience") || kw.includes("work")) category = "experience";
+    else if (kw.includes("project")) category = "projects";
+    else if (kw.includes("education") || kw.includes("degree")) category = "education";
 
-    const portfolioContext = portfolio
-      ? `Name: ${portfolio.name}, Title: ${portfolio.title}, Email: ${portfolio.email}, Location: ${portfolio.location}`
-      : "";
+    const docs = await CareerInfo.find(category ? { category } : {})
+      .select("category title content")
+      .limit(3);
 
-    const careerContext = careerInfoDocs
-      .map((doc) => `[${doc.category.toUpperCase()}] ${doc.title}: ${doc.content}`)
-      .join("\n\n");
+    const context = docs.map((d) => `${d.title}: ${d.content}`).join("\n");
 
-    const systemPrompt = `You are Meshach Christo's AI Career Assistant. You help visitors learn about Meshach's skills, experience, projects, and availability.
+    const prompt = `You are ${portfolio?.name || "Meshach"}'s AI assistant (${portfolio?.title || "Full Stack Developer"}). Speak as Meshach in first person. Be brief and helpful.
+Contact: ${portfolio?.email || "jmchristo.2000@gmail.com"}
+${context ? `Context:\n${context}` : ""}
 
-PERSONALITY:
-- Friendly, professional, and enthusiastic
-- Speak in first person as if you ARE Meshach
-- Keep answers concise but informative
-- If you don't know something, say you'd need to check with Meshach directly
-
-CONTEXT ABOUT MESHACH:
-${portfolioContext}
-
-KNOWLEDGE BASE:
-${careerContext}
-
-INSTRUCTIONS:
-- Answer questions based on the context provided above
-- If the context doesn't have enough information, be honest about it
-- Encourage visitors to reach out via email for more details
-- Mention availability for freelance/full-time opportunities when relevant`;
+User: ${message}`;
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-    const history = conversationHistory.map((msg) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
-    }));
-
-    const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: systemPrompt }] },
-        { role: "model", parts: [{ text: "Understood! I'm ready to assist as Meshach's AI Career Assistant." }] },
-        ...history,
-      ],
-    });
-
-    const result = await chat.sendMessage(message);
+    const result = await model.generateContent(prompt);
     const response = result.response.text();
 
     res.json({ response, sources: [] });
   } catch (error) {
-    console.error("AI Chat error:", error.message, error.stack);
+    console.error("AI Chat error:", error.message);
     res.status(500).json({ error: "Failed to process chat message", detail: error.message });
   }
 });
 
 router.get("/suggestions", async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne();
+    const portfolio = await Portfolio.findOne().select("name");
     const name = portfolio?.name || "Meshach";
-
     res.json({
       suggestions: [
         `What are ${name}'s top technical skills?`,
@@ -92,20 +65,16 @@ router.get("/suggestions", async (req, res) => {
 
 router.post("/seed", auth, async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
-    }
+    if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
 
     const portfolio = await Portfolio.findOne();
-    if (!portfolio) {
-      return res.status(404).json({ message: "Portfolio not found" });
-    }
+    if (!portfolio) return res.status(404).json({ message: "Portfolio not found" });
 
     await CareerInfo.deleteMany({});
     const careerData = [];
 
     if (portfolio.summary) {
-      careerData.push({ category: "summary", title: "Professional Summary", content: portfolio.summary, metadata: { tags: ["about", "summary"], priority: 3 }, embedding: [] });
+      careerData.push({ category: "summary", title: "Professional Summary", content: portfolio.summary, metadata: { tags: ["about"], priority: 3 }, embedding: [] });
     }
 
     if (portfolio.skills) {
@@ -120,23 +89,17 @@ router.post("/seed", auth, async (req, res) => {
       }
     }
 
-    if (portfolio.experiences?.length > 0) {
-      portfolio.experiences.forEach((exp) => {
-        careerData.push({ category: "experience", title: `${exp.title} at ${exp.company}`, content: `${exp.title} at ${exp.company} (${exp.period}). ${exp.description.join(". ")}`, metadata: { tags: ["experience"], priority: 2 }, embedding: [] });
-      });
-    }
+    portfolio.experiences?.forEach((exp) => {
+      careerData.push({ category: "experience", title: `${exp.title} at ${exp.company}`, content: `${exp.title} at ${exp.company} (${exp.period}). ${exp.description.join(". ")}`, metadata: { tags: ["experience"], priority: 2 }, embedding: [] });
+    });
 
-    if (portfolio.education?.length > 0) {
-      portfolio.education.forEach((edu) => {
-        careerData.push({ category: "education", title: `${edu.degree}`, content: `${edu.degree} at ${edu.institution} (${edu.period}). GPA: ${edu.gpa || "N/A"}`, metadata: { tags: ["education"], priority: 1 }, embedding: [] });
-      });
-    }
+    portfolio.education?.forEach((edu) => {
+      careerData.push({ category: "education", title: edu.degree, content: `${edu.degree} at ${edu.institution} (${edu.period}). GPA: ${edu.gpa || "N/A"}`, metadata: { tags: ["education"], priority: 1 }, embedding: [] });
+    });
 
-    if (portfolio.projects?.length > 0) {
-      portfolio.projects.forEach((project) => {
-        careerData.push({ category: "projects", title: project.title, content: `${project.title}. Tech: ${project.techStack}. ${project.description}. Features: ${project.features.join(". ")}`, metadata: { tags: ["project"], priority: 2 }, embedding: [] });
-      });
-    }
+    portfolio.projects?.forEach((project) => {
+      careerData.push({ category: "projects", title: project.title, content: `${project.title}. Tech: ${project.techStack}. ${project.description}`, metadata: { tags: ["project"], priority: 2 }, embedding: [] });
+    });
 
     await CareerInfo.insertMany(careerData);
     res.json({ message: "Career knowledge base seeded successfully", count: careerData.length });
@@ -148,9 +111,7 @@ router.post("/seed", auth, async (req, res) => {
 
 router.get("/knowledge-base", auth, async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
-    }
+    if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
     const items = await CareerInfo.find().select("-embedding");
     res.json(items);
   } catch (error) {
