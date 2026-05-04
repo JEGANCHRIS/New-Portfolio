@@ -1,15 +1,12 @@
 import express from "express";
-import { Ollama } from "ollama";
-import CareerInfo from "../models/CareerInfo.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import Portfolio from "../models/Portfolio.js";
+import CareerInfo from "../models/CareerInfo.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
-const ollama = new Ollama({
-  host: process.env.OLLAMA_HOST || "http://localhost:11434",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Chat with AI Career Assistant
 router.post("/chat", async (req, res) => {
   try {
     const { message, conversationHistory = [] } = req.body;
@@ -18,55 +15,17 @@ router.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Step 1: Generate embedding for the user's query
-    const embeddingResponse = await ollama.embeddings({
-      model: process.env.EMBEDDING_MODEL || "nomic-embed-text",
-      prompt: message,
-    });
-
-    const queryEmbedding = embeddingResponse.embedding;
-
-    // Step 2: Vector search in MongoDB Atlas
-    const similarDocs = await CareerInfo.aggregate([
-      {
-        $vectorSearch: {
-          index: "career_info_index",
-          path: "embedding",
-          queryVector: queryEmbedding,
-          numCandidates: 10,
-          limit: 5,
-        },
-      },
-      {
-        $project: {
-          title: 1,
-          content: 1,
-          category: 1,
-          metadata: 1,
-          score: { $meta: "vectorSearchScore" },
-        },
-      },
-    ]);
-
-    // Step 3: Build context from retrieved documents
-    const context = similarDocs
-      .map(
-        (doc) => `[${doc.category.toUpperCase()}] ${doc.title}: ${doc.content}`,
-      )
-      .join("\n\n");
-
-    // Step 4: Get portfolio data for additional context
     const portfolio = await Portfolio.findOne();
+    const careerInfoDocs = await CareerInfo.find().select("-embedding").limit(20);
+
     const portfolioContext = portfolio
-      ? `
-Name: ${portfolio.name}
-Title: ${portfolio.title}
-Email: ${portfolio.email}
-Location: ${portfolio.location}
-    `.trim()
+      ? `Name: ${portfolio.name}, Title: ${portfolio.title}, Email: ${portfolio.email}, Location: ${portfolio.location}`
       : "";
 
-    // Step 5: Build the RAG prompt
+    const careerContext = careerInfoDocs
+      .map((doc) => `[${doc.category.toUpperCase()}] ${doc.title}: ${doc.content}`)
+      .join("\n\n");
+
     const systemPrompt = `You are Meshach Christo's AI Career Assistant. You help visitors learn about Meshach's skills, experience, projects, and availability.
 
 PERSONALITY:
@@ -78,8 +37,8 @@ PERSONALITY:
 CONTEXT ABOUT MESHACH:
 ${portfolioContext}
 
-RELEVANT INFORMATION FROM KNOWLEDGE BASE:
-${context}
+KNOWLEDGE BASE:
+${careerContext}
 
 INSTRUCTIONS:
 - Answer questions based on the context provided above
@@ -87,65 +46,50 @@ INSTRUCTIONS:
 - Encourage visitors to reach out via email for more details
 - Mention availability for freelance/full-time opportunities when relevant`;
 
-    // Step 6: Get AI response
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...conversationHistory,
-      { role: "user", content: message },
-    ];
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const response = await ollama.chat({
-      model: process.env.CHAT_MODEL || "llama3.2",
-      messages: messages,
-      stream: false,
+    const history = conversationHistory.map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const chat = model.startChat({
+      history: [
+        { role: "user", parts: [{ text: systemPrompt }] },
+        { role: "model", parts: [{ text: "Understood! I'm ready to assist as Meshach's AI Career Assistant." }] },
+        ...history,
+      ],
     });
 
-    res.json({
-      response: response.message.content,
-      sources: similarDocs.map((doc) => ({
-        title: doc.title,
-        category: doc.category,
-        score: doc.score,
-      })),
-    });
+    const result = await chat.sendMessage(message);
+    const response = result.response.text();
+
+    res.json({ response, sources: [] });
   } catch (error) {
     console.error("AI Chat error:", error.message);
-
-    // Fallback response if Ollama is not available
-    if (error.code === "ECONNREFUSED") {
-      return res.status(503).json({
-        response:
-          "Hi! I'm Meshach's AI assistant. Currently, my AI brain is taking a nap (Ollama server isn't running). But feel free to reach out to Meshach directly at jmchristo.2000@gmail.com!",
-        sources: [],
-        fallback: true,
-      });
-    }
-
     res.status(500).json({ error: "Failed to process chat message" });
   }
 });
 
-// Get conversation suggestions
 router.get("/suggestions", async (req, res) => {
   try {
     const portfolio = await Portfolio.findOne();
     const name = portfolio?.name || "Meshach";
 
-    const suggestions = [
-      `What are ${name}'s top technical skills?`,
-      `Tell me about ${name}'s recent projects`,
-      `Is ${name} available for freelance work?`,
-      `What's ${name}'s experience with React?`,
-      `How can I contact ${name}?`,
-    ];
-
-    res.json({ suggestions });
+    res.json({
+      suggestions: [
+        `What are ${name}'s top technical skills?`,
+        `Tell me about ${name}'s recent projects`,
+        `Is ${name} available for freelance work?`,
+        `What's ${name}'s experience with React?`,
+        `How can I contact ${name}?`,
+      ],
+    });
   } catch (error) {
     res.status(500).json({ error: "Failed to load suggestions" });
   }
 });
 
-// Seed career knowledge base (admin only)
 router.post("/seed", auth, async (req, res) => {
   try {
     if (req.user.role !== "admin") {
@@ -157,182 +101,56 @@ router.post("/seed", auth, async (req, res) => {
       return res.status(404).json({ message: "Portfolio not found" });
     }
 
-    // Clear existing data
     await CareerInfo.deleteMany({});
-
     const careerData = [];
 
-    // Add summary
     if (portfolio.summary) {
-      careerData.push({
-        category: "summary",
-        title: "Professional Summary",
-        content: portfolio.summary,
-        metadata: { tags: ["about", "summary", "intro"], priority: 3 },
-      });
+      careerData.push({ category: "summary", title: "Professional Summary", content: portfolio.summary, metadata: { tags: ["about", "summary"], priority: 3 }, embedding: [] });
     }
 
-    // Add skills
     if (portfolio.skills) {
       const allSkills = [
-        ...(portfolio.skills.frontend || []).map(
-          (s) => `${s.name} (${s.level}%)`,
-        ),
-        ...(portfolio.skills.backend || []).map(
-          (s) => `${s.name} (${s.level}%)`,
-        ),
-        ...(portfolio.skills.databases || []).map(
-          (s) => `${s.name} (${s.level}%)`,
-        ),
+        ...(portfolio.skills.frontend || []).map((s) => `${s.name} (${s.level}%)`),
+        ...(portfolio.skills.backend || []).map((s) => `${s.name} (${s.level}%)`),
+        ...(portfolio.skills.databases || []).map((s) => `${s.name} (${s.level}%)`),
         ...(portfolio.skills.tools || []).map((s) => `${s.name} (${s.level}%)`),
       ];
-
       if (allSkills.length > 0) {
-        careerData.push({
-          category: "skills",
-          title: "Technical Skills",
-          content: `Meshach is proficient in: ${allSkills.join(", ")}. He continuously learns new technologies and stays updated with industry trends.`,
-          metadata: {
-            tags: ["skills", "technologies", "expertise"],
-            priority: 3,
-          },
-        });
-      }
-
-      // Individual skill entries for better search
-      if (portfolio.skills.frontend) {
-        portfolio.skills.frontend.forEach((skill) => {
-          careerData.push({
-            category: "skills",
-            title: `Frontend: ${skill.name}`,
-            content: `${skill.name} - Proficiency: ${skill.level}%. Experience building responsive and interactive user interfaces.`,
-            metadata: {
-              tags: ["frontend", skill.name.toLowerCase(), "react", "ui"],
-              priority: 2,
-            },
-          });
-        });
-      }
-
-      if (portfolio.skills.backend) {
-        portfolio.skills.backend.forEach((skill) => {
-          careerData.push({
-            category: "skills",
-            title: `Backend: ${skill.name}`,
-            content: `${skill.name} - Proficiency: ${skill.level}%. Experience building scalable APIs and server-side applications.`,
-            metadata: {
-              tags: ["backend", skill.name.toLowerCase(), "api", "node"],
-              priority: 2,
-            },
-          });
-        });
+        careerData.push({ category: "skills", title: "Technical Skills", content: `Proficient in: ${allSkills.join(", ")}`, metadata: { tags: ["skills"], priority: 3 }, embedding: [] });
       }
     }
 
-    // Add experiences
-    if (portfolio.experiences && portfolio.experiences.length > 0) {
+    if (portfolio.experiences?.length > 0) {
       portfolio.experiences.forEach((exp) => {
-        careerData.push({
-          category: "experience",
-          title: `${exp.title} at ${exp.company}`,
-          content: `${exp.title} at ${exp.company} (${exp.period}). Location: ${exp.location}. Responsibilities: ${exp.description.join(". ")}`,
-          metadata: {
-            tags: ["experience", "work", exp.company.toLowerCase()],
-            priority: 2,
-          },
-        });
+        careerData.push({ category: "experience", title: `${exp.title} at ${exp.company}`, content: `${exp.title} at ${exp.company} (${exp.period}). ${exp.description.join(". ")}`, metadata: { tags: ["experience"], priority: 2 }, embedding: [] });
       });
     }
 
-    // Add education
-    if (portfolio.education && portfolio.education.length > 0) {
+    if (portfolio.education?.length > 0) {
       portfolio.education.forEach((edu) => {
-        careerData.push({
-          category: "education",
-          title: `${edu.degree} from ${edu.institution}`,
-          content: `${edu.degree} at ${edu.institution} (${edu.period}). GPA: ${edu.gpa || "N/A"}`,
-          metadata: {
-            tags: ["education", "degree", edu.institution.toLowerCase()],
-            priority: 1,
-          },
-        });
+        careerData.push({ category: "education", title: `${edu.degree}`, content: `${edu.degree} at ${edu.institution} (${edu.period}). GPA: ${edu.gpa || "N/A"}`, metadata: { tags: ["education"], priority: 1 }, embedding: [] });
       });
     }
 
-    // Add projects
-    if (portfolio.projects && portfolio.projects.length > 0) {
+    if (portfolio.projects?.length > 0) {
       portfolio.projects.forEach((project) => {
-        careerData.push({
-          category: "projects",
-          title: project.title,
-          content: `${project.title}. Tech Stack: ${project.techStack}. Description: ${project.description}. Key Features: ${project.features.join(". ")}. ${project.liveLink ? `Live: ${project.liveLink}` : ""} ${project.githubLink ? `GitHub: ${project.githubLink}` : ""}`,
-          metadata: {
-            tags: [
-              "project",
-              "portfolio",
-              ...project.techStack
-                .toLowerCase()
-                .split(",")
-                .map((s) => s.trim()),
-            ],
-            priority: 2,
-          },
-        });
+        careerData.push({ category: "projects", title: project.title, content: `${project.title}. Tech: ${project.techStack}. ${project.description}. Features: ${project.features.join(". ")}`, metadata: { tags: ["project"], priority: 2 }, embedding: [] });
       });
-    }
-
-    // Add availability info
-    careerData.push({
-      category: "availability",
-      title: "Work Availability",
-      content: `Meshach is currently ${portfolio.stats?.yearsExperience > 0 ? "open to" : "actively seeking"} new opportunities including full-time positions, freelance projects, and internships. Available for remote work and willing to relocate. Contact: ${portfolio.email}`,
-      metadata: {
-        tags: ["availability", "hiring", "freelance", "full-time", "remote"],
-        priority: 3,
-      },
-    });
-
-    // Generate embeddings and save
-    const embeddingModel = process.env.EMBEDDING_MODEL || "nomic-embed-text";
-
-    for (const item of careerData) {
-      try {
-        const embedding = await ollama.embeddings({
-          model: embeddingModel,
-          prompt: `${item.title}: ${item.content}`,
-        });
-        item.embedding = embedding.embedding;
-      } catch (embedError) {
-        console.error(
-          `Failed to generate embedding for "${item.title}":`,
-          embedError.message,
-        );
-        // Save without embedding if Ollama fails
-        item.embedding = new Array(768).fill(0);
-      }
     }
 
     await CareerInfo.insertMany(careerData);
-
-    res.json({
-      message: "Career knowledge base seeded successfully",
-      count: careerData.length,
-    });
+    res.json({ message: "Career knowledge base seeded successfully", count: careerData.length });
   } catch (error) {
     console.error("Seed error:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to seed career data", error: error.message });
+    res.status(500).json({ message: "Failed to seed career data", error: error.message });
   }
 });
 
-// Get all career info (for debugging/admin)
 router.get("/knowledge-base", auth, async (req, res) => {
   try {
     if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Access denied" });
     }
-
     const items = await CareerInfo.find().select("-embedding");
     res.json(items);
   } catch (error) {
